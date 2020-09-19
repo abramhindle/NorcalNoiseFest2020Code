@@ -18,7 +18,7 @@ import param_generation as pg
 import norcalextract
 sr=48000
 
-def prog_map(elms, f, desc="Synth", chunksize=1,procs=4,order=True):
+def prog_map(elms, f, desc="Synth", chunksize=1,procs=8,order=True):
     with tqdm(elms, desc=desc) as t:
         with multiprocessing.Pool(procs, initializer=tqdm.set_lock,
               initargs=(tqdm.get_lock(),)) as p:
@@ -56,7 +56,7 @@ def generate(csvfd,spec):
                  for x in range(spec["n"])]
     for tup in prog_map(filenames, generate_and_save_tuple, chunksize=16, order=False):
         (filename,row) = tup
-        csvfd.write(norcalextract.text_of_row(filename,row))
+        csvfd.write(norcalextract.text_of_row(filename,row)+"\n")
         
 
 

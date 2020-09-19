@@ -109,7 +109,7 @@ def parse_args():
     return args
 
 def mean_features(features):
-    return np.mean(features, axis=1)
+    return np.mean(features, axis=0)
 
 def calc_row_from_buffer(buffer):
     row = mean_features(calc_features(np.asarray(buffer[0:,0])))
@@ -122,6 +122,26 @@ def calc_row(filename):
 
 def text_of_row(filename,row):
     return ",".join(['"'+filename+'"', ",".join([str(x) for x in row])])
+
+def load_db(filename):
+    with open(filename) as fd:
+        lines = fd.readlines()
+        # check for header?
+        n = len(lines)
+        w = len(lines[0].split(",")) - 1
+        db = np.zeros((n,w))
+        filenames  = []
+        filenameid = {}
+        i = 0
+        for line in lines:
+            s = line.strip().split(",")
+            fname = s[0]
+            row = [float(x) for x in s[1:]]
+            db[i,0:w] = row[0:w]
+            filenames.append(fname)
+            filenameid[fname] = i
+            i+=1
+        return {"rows":db,"filenames":filenames,"id":filenameid}
 
 if __name__ == "__main__":
     args = parse_args()
