@@ -54,21 +54,21 @@ def calculate_similarity(ttfeatures, db, sim='cosine'):
     
 
 def fit_to_input(ttres):
-    ttfilt = np.nan_to_num(ttres,nan=-np.Inf)    
-    ttfit = np.argmax(ttfilter,axis=1)
+    ttfilt = np.nan_to_num(ttres,nan=np.Inf,copy=False)
+    ttfit = np.argmin(ttfilt,axis=1)
     return ttfit
 
 def render(ttfeatures, ttfit, db,freq=1.0):
     out = dsp.buffer(length=512*ttfeatures.shape[0]/sr)
     skip = sr//int((1/freq)*512)
-    steps = ttargmin.shape[0] // skip
+    steps = ttfit.shape[0] // skip
     for i in range(steps):
         j = i * skip
-        index = int(ttargmin[j])
+        index = int(ttfit[j])
         s = get_samples(db["filenames"][index])
         t = j * 512 / sr
         print(t,index)
-        out.dub(s.buff,t)
+        out.dub(s,t)
     return out
 
 def parse_args():
@@ -77,6 +77,7 @@ def parse_args():
     parser.add_argument('-out',default='output.wav', help='the rendered output')
     parser.add_argument('-csv',default="out.csv",help="input csv file")
     parser.add_argument('-s', default=1.0,help='frequency per second of sounds')
+    parser.add_argument('-sim', default='euclidean',help='similarity [cosine, canberra, dice, yule, hamming, correlation, euclidean, sqeuclidean]')
     args = parser.parse_args()
     return args
 
@@ -93,7 +94,7 @@ if __name__ == "__main__":
     print(ttfeatures.shape)
     print(db["rows"].shape)
     print("Calculating Similarity")
-    ttres = calculate_similarity(ttfeatures, db)
+    ttres = calculate_similarity(ttfeatures, db, sim=args.sim)
     print("Filtering")
     ttfit = fit_to_input(ttres)
     print(ttfit.shape)

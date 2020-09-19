@@ -136,6 +136,7 @@ def load_db(filename):
         for line in lines:
             s = line.strip().split(",")
             fname = s[0]
+            fname = fname.strip('"')
             row = [float(x) for x in s[1:]]
             db[i,0:w] = row[0:w]
             filenames.append(fname)
