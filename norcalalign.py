@@ -59,7 +59,7 @@ def fit_to_input(ttres):
     return ttfit
 
 def render(ttfeatures, ttfit, db,freq=1.0):
-    out = dsp.buffer(length=512*ttfeatures.shape[0]/sr)
+    out = dsp.buffer(length=512*ttfeatures.shape[0]/sr, samplerate=sr)
     skip = sr//int((1/freq)*512)
     steps = ttfit.shape[0] // skip
     for i in range(steps):
@@ -67,7 +67,7 @@ def render(ttfeatures, ttfit, db,freq=1.0):
         index = int(ttfit[j])
         s = get_samples(db["filenames"][index])
         t = j * 512 / sr
-        print(t,index)
+        # print(t,index)
         out.dub(s,t)
     return out
 
@@ -86,6 +86,7 @@ if __name__ == "__main__":
     filename = args.i
     print("Loading %s" % filename)
     input_snd = dsp.read(args.i)
+    print(input_snd.frames.shape)
     freq = float(args.s)
     print("Loading %s" % args.csv)
     db = norcalextract.load_db(args.csv)

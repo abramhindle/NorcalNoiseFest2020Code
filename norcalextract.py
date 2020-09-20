@@ -154,7 +154,7 @@ if __name__ == "__main__":
                 newsounds = sorted(glob.glob(sound+"/*wav"))
             for sound in newsounds:
                 row = calc_row(sound)
-                out = text_of_row(filename, row)
+                out = text_of_row(sound, row)
                 print(out)
                 fd.write(out+"\n")
 
